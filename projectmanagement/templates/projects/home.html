@@ -1,1 +1,42 @@
-<h1>Projects</h1>
+{% extends 'index.html' %}
+
+{% block title %}
+    Home - Project Management
+{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Project Management System!</h1>
+    
+    <!-- Table to display projects -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Project ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proj in projects %}
+            <tr>
+                <td>{{ proj.name }}</td>
+                <td>{{ proj.project_id }}</td>
+                <td>{% if proj.project_status %} Active {% else %} Inactive {% endif %}</td>
+                <td>
+                    <!-- Edit button -->
+                    <a href="{% url 'edit_project' proj.id %}" class="btn btn-primary">Edit</a>
+                    <!-- Delete button -->
+                    <form action="{% url 'delete_project' proj.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Link to add a new project -->
+    <a href="{% url 'add_project' %}" class="btn btn-success">Add Project</a>
+{% endblock %}
