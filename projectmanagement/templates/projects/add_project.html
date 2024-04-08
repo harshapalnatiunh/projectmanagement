@@ -1,1 +1,21 @@
-<h1>add project</h1>
+{% extends 'index.html' %}
+
+{% block title %}
+    Add Project - Project Management
+{% endblock %}
+
+{% block content %}
+    <h2>Add New Project</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Project Name</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="form-group">
+            <label for="project_id">Project ID</label>
+            <input type="text" class="form-control" id="project_id" name="project_id">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}
