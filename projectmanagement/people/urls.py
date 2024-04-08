@@ -3,6 +3,7 @@ from django.urls import path
 from .views import*
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path("home/", people_home),
+    path('fetch_people_data/', fetch_people_data, name='fetch_people_data'),
+
 ]
