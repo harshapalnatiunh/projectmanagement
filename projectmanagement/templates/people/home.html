@@ -1,23 +1,48 @@
-<!-- users.html -->
-
+<!-- home_ajax.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Data</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <h1>User Data</h1>
-    <ul>
-        {% for user in users %}
-            <li>
-                <img src="{{ user.image }}" alt="User Image">
-                <p>Name: {{ user.firstName }} {{ user.lastName }}</p>
-                <p>Email: {{ user.email }}</p>
-                <!-- Add more details as needed -->
-            </li>
-        {% endfor %}
+    <ul id="user-list">
+        <!-- User data will be populated here -->
     </ul>
+
+    <script>
+       $(document).ready(function(){
+    console.log("Document ready function executed");
+    $.ajax({
+        url: '/people/fetch_people_data/',
+        type: 'GET',
+        success: function(data) {
+            console.log("AJAX request successful");
+            var users = data.users;
+            var userList = $('#user-list');
+
+            // Clear existing list items
+            userList.empty();
+
+            // Append fetched users to the list
+            $.each(users, function(index, user) {
+                var listItem = '<li>' +
+                    '<img src="' + user.image + '" alt="User Image">' +
+                    '<p>Name: ' + user.firstName + ' ' + user.lastName + '</p>' +
+                    '<p>Email: ' + user.email + '</p>' +
+                    '</li>';
+                userList.append(listItem);
+            });
+        },
+        error: function(xhr, textStatus, errorThrown){
+            console.log("Error:", errorThrown);
+        }
+    });
+});
+
+    </script>
 </body>
 </html>
