@@ -26,6 +26,8 @@
                 <td>
                     <!-- Edit button -->
                     <a href="{% url 'edit_project' proj.id %}" class="btn btn-primary">Edit</a>
+                    <!-- Detial button -->
+<a href="{% url 'project_detail' proj.id %}" class="btn btn-primary">Project Details</a>
                     <!-- Delete button -->
                     <form action="{% url 'delete_project' proj.id %}" method="post" style="display: inline;">
                         {% csrf_token %}

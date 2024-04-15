@@ -15,6 +15,10 @@ def project_home(request):
     projects = project.objects.all()  # Retrieve all projects from the database
     return render(request, "projects/home.html", {'projects': projects})
 
+def project_detail(request, project_id):
+    proj = get_object_or_404(project, id=project_id)
+    return render(request, 'projects/project_detail.html', {'project': proj})
+
 def edit_project(request, project_id):
     proj = get_object_or_404(project, id=project_id)
     if request.method == 'POST':
