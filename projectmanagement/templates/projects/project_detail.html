@@ -1,0 +1,18 @@
+<!-- project_detail.html -->
+{% extends 'index.html' %}
+
+{% block title %}
+    Project Detail - {{ project.name }}
+{% endblock %}
+
+{% block content %}
+    <h1>Project Detail</h1>
+    <p><strong>Project Name:</strong> {{ project.name }}</p>
+    <p><strong>Project ID:</strong> {{ project.project_id }}</p>
+    <p><strong>Status:</strong> {% if project.project_status %} Active {% else %} Inactive {% endif %}</p>
+    <a href="{% url 'edit_project' project.id %}" class="btn btn-primary">Edit</a>
+    <form action="{% url 'delete_project' project.id %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+{% endblock %}
