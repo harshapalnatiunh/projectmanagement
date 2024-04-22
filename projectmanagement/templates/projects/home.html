@@ -25,13 +25,13 @@
                 <td>{% if proj.project_status %} Active {% else %} Inactive {% endif %}</td>
                 <td>
                     <!-- Edit button -->
-                    <a href="{% url 'edit_project' proj.id %}" class="btn btn-primary">Edit</a>
+                    {% comment %} <a href="{% url 'edit_project' proj.id %}" class="btn btn-primary">Edit</a> {% endcomment %}
                     <!-- Detial button -->
 <a href="{% url 'project_detail' proj.id %}" class="btn btn-primary">Project Details</a>
                     <!-- Delete button -->
                     <form action="{% url 'delete_project' proj.id %}" method="post" style="display: inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        {% comment %} <button type="submit" class="btn btn-danger">Delete</button> {% endcomment %}
                     </form>
                 </td>
             </tr>
