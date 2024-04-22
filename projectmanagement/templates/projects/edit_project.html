@@ -1,0 +1,192 @@
+{% extends 'index.html' %} {% block title %} Edit Project - Project Management
+{% endblock %} {% block content %}
+<h2>Edit Project</h2>
+<form method="post" id="editForm">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="{{ form.name.id_for_label }}">Project Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="{{ form.name.id_for_label }}"
+      name="{{ form.name.html_name }}"
+      value="{{ form.name.value|default_if_none:'' }}"
+    />
+    {% if form.name.errors %}
+    <div class="alert alert-danger">{{ form.name.errors }}</div>
+    {% endif %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.project_id.id_for_label }}">Project ID</label>
+    <input
+      type="text"
+      class="form-control"
+      id="{{ form.project_id.id_for_label }}"
+      name="{{ form.project_id.html_name }}"
+      value="{{ form.project_id.value|default_if_none:'' }}"
+      readonly
+    />
+    {% if form.project_id.errors %}
+    <div class="alert alert-danger">{{ form.project_id.errors }}</div>
+    {% endif %}
+  </div>
+  <div class="form-group">
+    <label for="{{ form.project_status.id_for_label }}">Project Status</label>
+    <div class="custom-control custom-switch">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="{{ form.project_status.id_for_label }}"
+        name="{{ form.project_status.html_name }}"
+        {%
+        if
+        form.project_status.value
+        %}checked{%
+        endif
+        %}
+      />
+      <label
+        class="custom-control-label"
+        for="{{ form.project_status.id_for_label }}"
+        >Active</label
+      >
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="employees_to_remove">Employees to remove:</label>
+    {{ form.employees_to_remove }}
+    {% comment %} <select multiple class="form-control" id="employees_to_remove" name="employees_to_remove">
+      {% for employee in form.fields.employees_to_remove.queryset %}
+        <option value="{{ employee.id }}">{{ employee.name }}</option>
+      {% endfor %}
+    </select> {% endcomment %}
+  </div>
+  <button
+    type="button"
+    class="btn btn-primary"
+    data-toggle="modal"
+    data-target="#confirmModal"
+  >
+    Save changes
+  </button>
+</form>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="confirmModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="confirmModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Confirm Changes</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to save changes?</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmSave">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    console.log('Script started');
+
+    var formElement = document.getElementById('editForm');
+    console.log('Form element:', formElement);
+    
+    var confirmSaveButton = document.getElementById('confirmSave');
+    console.log('Confirm save button:', confirmSaveButton);
+    
+    confirmSaveButton.addEventListener('click', function() {
+        console.log('Confirm save button clicked');
+        formElement.submit();
+        console.log('Form submitted');
+    });
+</script>
+{% endblock %} {% comment %} {% block content %}
+<h2>Edit Project</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="name">Project Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="name"
+      name="name"
+      value="{{ proj.name }}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="project_id">Project ID</label>
+    <input
+      type="text"
+      class="form-control"
+      id="project_id"
+      name="project_id"
+      value="{{ proj.project_id }}"
+      readonly
+    />
+  </div>
+  <div class="form-group">
+    <label for="project_status">Project Status</label>
+    <div class="custom-control custom-switch">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="project_status"
+        name="project_status"
+        value="True"
+        {%
+        if
+        proj.project_status
+        %}checked{%
+        endif
+        %}
+      />
+      <label class="custom-control-label" for="project_status">Active</label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Employees</label>
+    {% for employee in employees %}
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        value="{{ employee.id }}"
+        id="employee-{{ employee.id }}"
+        name="employees"
+        checked
+      />
+      <label class="form-check-label" for="employee-{{ employee.id }}">
+        {{ employee.name }}
+      </label>
+    </div>
+    {% endfor %}
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+  console.log("Edit Project");
+</script>
+{% endblock %} {% endcomment %}

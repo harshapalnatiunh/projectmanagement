@@ -4,17 +4,18 @@ from .forms import *
 from employee.models import Employee
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def add_project(request):
     if request.method == 'POST':
-        # Handle form submission
-        name = request.POST.get('name')
-        project_id = request.POST.get('project_id')
-        new_project = project.objects.create(name=name, project_id=project_id)
-        return redirect('home')  # Redirect to home page after form submission
+        form = ProjectEditForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('home'))
     else:
-        return render(request, "projects/add_project.html", {})
+        form = ProjectEditForm()
+    return render(request, 'projects/add_project.html', {'form': form})
 
 def project_home(request):
     projects = project.objects.all()  # Retrieve all projects from the database
@@ -29,15 +30,42 @@ def project_detail(request, project_id):
 def edit_project(request, project_id):
     proj = get_object_or_404(project, id=project_id)
     if request.method == 'POST':
-        # Handle form submission for editing project
-        name = request.POST.get('name')
-        project_id = request.POST.get('project_id')
-        proj.name = name
-        proj.project_id = project_id
-        proj.save()
-        return redirect('home')  # Redirect to home page after editing
+        form = ProjectEditForm(request.POST, instance=proj)
+        if form.is_valid():
+            proj = form.save(commit=False)
+            # Get the employees to remove
+            employees_to_remove = form.cleaned_data['employees_to_remove']
+            # Remove the employees from the project
+            for employee in employees_to_remove:
+                employee.projects.remove(proj)
+                employee.save()
+            proj.save()
+            return HttpResponseRedirect(reverse('project_detail', args=[project_id]))
     else:
-        return render(request, 'projects/edit_project.html', {'proj': proj})
+        form = ProjectEditForm(instance=proj)
+    return render(request, 'projects/edit_project.html', {'form': form})
+
+# def edit_project(request, project_id):
+#     proj = get_object_or_404(project, id=project_id)
+#     employees = proj.employee_set.all() 
+#     if request.method == 'POST':
+#         # Handle form submission for editing project
+#         name = request.POST.get('name')
+#         project_id = request.POST.get('project_id')
+#         employees = request.POST.getlist('employees')
+#         project_status = request.POST.get('project_status') == 'True' 
+#         proj.name = name
+#         proj.project_status = project_status
+#         proj.project_id = project_id
+#         proj.employee_set.clear()  # Remove all employees from the project
+#         for employee_id in employees:
+#             employee = get_object_or_404(Employee, id=employee_id)  # Replace 'Employee' with your actual Employee model
+#             proj.employee_set.add(employee)  # Add the employee to the project
+#         proj.save()
+#         return HttpResponseRedirect(reverse('home'))  # Redirect to home page after editing
+#     else:
+#         employees = proj.employee_set.all()  # Accessing related employees
+#         return render(request, 'projects/edit_project.html', {'proj': proj, 'employees': employees})
 
 def delete_project(request, project_id):
     proj = get_object_or_404(project, id=project_id)
