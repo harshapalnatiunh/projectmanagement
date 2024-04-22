@@ -1,5 +1,6 @@
 <!-- project_detail.html -->
 {% extends 'index.html' %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 {% block title %}
     Project Detail - {{ project.name }}
@@ -10,7 +11,61 @@
     <p><strong>Project Name:</strong> {{ project.name }}</p>
     <p><strong>Project ID:</strong> {{ project.project_id }}</p>
     <p><strong>Status:</strong> {% if project.project_status %} Active {% else %} Inactive {% endif %}</p>
-    <a href="{% url 'edit_project' project.id %}" class="btn btn-primary">Edit</a>
+  
+    <h2>Employees in this Project:</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.name }}</td>
+                    <td>{{ employee.email }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No employees assigned to this project</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'edit_project' project.id %}" class="btn btn-primary" data-toggle="modal" data-target="#addEmployeeModal">Add Employee</a>
+
+    <!-- Add Employee Modal -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee to Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm" action="{% url 'add_employee_to_project' project.id %}" method="post">
+                        {% csrf_token %}
+                        <!-- You can keep the select dropdown here -->
+                        <select id="employeeSelect" name="employee_name">
+                            <option value="">Select Employee</option>
+                        </select>
+                         <input type="hidden" id="employeeAge" name="employee_age">
+                    <input type="hidden" id="employeeEmail" name="employee_email">
+                    <input type="hidden" id="employeePhone" name="employee_phone">
+                    <input type="hidden" id="employeeImage" name="employee_image">
+                    <input type="hidden" id="employeeGender" name="employee_gender">
+                        <button type="submit" class="btn btn-primary">Add Employee</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete</button>
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -35,4 +90,51 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    console.log("Document ready function executed");
+    fetch('/people/fetch_people_data/')
+        .then(response => response.json())
+        .then(data => {
+            console.log("AJAX request successful");
+            var users = data.users;
+            console.log("Users:", users); // Log the users array
+            var employeeSelect = document.getElementById('employeeSelect');
+
+            // Append fetched users to the select dropdown in the modal
+            users.forEach(user => {
+                var option = document.createElement('option');
+                option.value = user.firstName + ' ' + user.lastName;
+                option.textContent = user.firstName + ' ' + user.lastName;
+                employeeSelect.appendChild(option);
+            });
+
+            // Event listener for when an employee is selected
+            employeeSelect.addEventListener('change', function() {
+                var selectedEmployee = employeeSelect.options[employeeSelect.selectedIndex].text;
+                console.log("Selected employee:", selectedEmployee); // Log the selected employee
+                var selectedEmployeeDetails = users.find(user => (user.firstName + ' ' + user.lastName) === selectedEmployee);
+
+                // Populate hidden form fields with selected employee details
+                if (selectedEmployeeDetails) {
+                    document.getElementById('employeeAge').value = selectedEmployeeDetails.age;
+                    document.getElementById('employeeEmail').value = selectedEmployeeDetails.email;
+                    document.getElementById('employeePhone').value = selectedEmployeeDetails.phone;
+                    document.getElementById('employeeImage').value = selectedEmployeeDetails.image;
+                    document.getElementById('employeeGender').value = selectedEmployeeDetails.gender;
+                } else {
+                    // Clear the hidden form fields if no employee is selected
+                    document.getElementById('employeeAge').value = '';
+                    document.getElementById('employeeEmail').value = '';
+                    document.getElementById('employeePhone').value = '';
+                    document.getElementById('employeeImage').value = '';
+                    document.getElementById('employeeGender').value = '';
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+});
+
+</script>
 {% endblock %}
