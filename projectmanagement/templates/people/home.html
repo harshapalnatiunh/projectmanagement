@@ -1,48 +1,70 @@
-<!-- home_ajax.html -->
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'index.html' %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Data</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <h1>User Data</h1>
-    <ul id="user-list">
-        <!-- User data will be populated here -->
-    </ul>
+    <div class="container">
+        <h1>User Data</h1>
+        <table id="user-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Username</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                <!-- User data will be populated here -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
-       $(document).ready(function(){
-    console.log("Document ready function executed");
-    $.ajax({
-        url: '/people/fetch_people_data/',
-        type: 'GET',
-        success: function(data) {
-            console.log("AJAX request successful");
-            var users = data.users;
-            var userList = $('#user-list');
+        $(document).ready(function(){
+            console.log("Document ready function executed");
+            $.ajax({
+                url: '/people/fetch_people_data/',
+                type: 'GET',
+                success: function(data) {
+                    console.log("AJAX request successful");
+                    var users = data.users;
+                    var userList = $('#user-list');
 
-            // Clear existing list items
-            userList.empty();
+                    // Clear existing table rows
+                    userList.empty();
 
-            // Append fetched users to the list
-            $.each(users, function(index, user) {
-                var listItem = '<li>' +
-                    '<img src="' + user.image + '" alt="User Image">' +
-                    '<p>Name: ' + user.firstName + ' ' + user.lastName + '</p>' +
-                    '<p>Email: ' + user.email + '</p>' +
-                    '</li>';
-                userList.append(listItem);
+                    // Append fetched users to the table
+                    $.each(users, function(index, user) {
+                        var address = user.address.address + ', ' + user.address.city + ', ' + user.address.state + ' ' + user.address.zipcode;
+                        var tableRow = '<tr>' +
+                            '<td><img src="' + user.image + '" alt="User Image" class="img-thumbnail"></td>' +
+                            '<td>' + user.firstName + ' ' + user.lastName + '</td>' +
+                            '<td>' + user.email + '</td>' +
+                            '<td>' + user.phone + '</td>' +
+                            '<td>' + user.username + '</td>' +
+                            '<td>' + address + '</td>' +
+                            '</tr>';
+                        userList.append(tableRow);
+                    });
+                },
+                error: function(xhr, textStatus, errorThrown){
+                    console.log("Error:", errorThrown);
+                }
             });
-        },
-        error: function(xhr, textStatus, errorThrown){
-            console.log("Error:", errorThrown);
-        }
-    });
-});
-
+        });
     </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>
+{% endblock %}
